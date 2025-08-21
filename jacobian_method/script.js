@@ -22,12 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         for (let i = 0; i < size; i++) {
             for (let j = 0; j < size; j++) {
-                const value = (i === j ? 1 : 0);
-                matrixContainer.innerHTML += `<input type="number" class="w-16 h-12 text-center rounded-md input-field" data-row="${i}" data-col="${j}" value="${value}" step="any">`;
+                matrixContainer.innerHTML += `<input type="number" class="w-16 h-12 text-center rounded-md input-field" data-row="${i}" data-col="${j}" value="" step="any">`;
             }
             matrixContainer.innerHTML += `<div class="w-px h-full bg-gray-600 justify-self-center"></div>`;
-            const bValue = 0;
-            matrixContainer.innerHTML += `<input type="number" class="w-16 h-12 text-center rounded-md input-field" data-row="${i}" data-vector="b" value="${bValue}" step="any">`;
+            matrixContainer.innerHTML += `<input type="number" class="w-16 h-12 text-center rounded-md input-field" data-row="${i}" data-vector="b" value="" step="any">`;
         }
     };
 
