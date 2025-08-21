@@ -49,12 +49,30 @@
             <div class="app-card p-6 mb-8">
                 <details>
                     <summary class="text-lg font-semibold text-emerald-400">What is the Jacobi Method?</summary>
-                    <div class="mt-4 text-gray-300 space-y-3 prose prose-invert max-w-none">
-                        <p>The Jacobi method is an iterative algorithm for determining the solutions of a strictly diagonally dominant system of linear equations. Each diagonal element is solved for, and an approximate value is plugged in. The process is then iterated until it converges.</p>
-                        <p>Given a system $Ax = b$, we can decompose matrix $A$ into $A = L+D+U$, where $L$ is the lower triangular part, $D$ is the diagonal, and $U$ is the upper triangular part.</p>
-                        <p>The iteration formula for each component $x_i$ at step $(k+1)$ is:</p>
-                        $$ x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j \neq i} a_{ij}x_j^{(k)} \right) $$ 
-                        <p>In matrix form, this is written as $x^{(k+1)} = Hx^{(k)} + C$, where the iteration matrix is $H = -D^{-1}(L+U)$ and the constant vector is $C = D^{-1}b$.</p>
+                    <div class="mt-4 text-gray-300 space-y-4 prose prose-invert max-w-none">
+                        <p>The Jacobi method is an iterative algorithm used to find the solutions of a strictly diagonally dominant system of linear equations. It works by solving for each diagonal element and then plugging in approximate values. This process is repeated, or iterated, until the solution converges to a desired level of accuracy.</p>
+                        
+                        <h4 class="text-emerald-500 font-semibold">The Core Idea</h4>
+                        <p>For a given system of equations $Ax = b$, we can decompose the matrix $A$ into three parts: </p>
+                        <ul class="list-disc list-inside">
+                            <li><b>L</b>: The strictly lower triangular part of A.</li>
+                            <li><b>D</b>: The diagonal part of A.</li>
+                            <li><b>U</b>: The strictly upper triangular part of A.</li>
+                        </ul>
+                        <p>So, $A = L + D + U$.</p>
+
+                        <h4 class="text-emerald-500 font-semibold">The Iteration Formula</h4>
+                        <p>The formula to find the $i$-th component of the solution vector $x$ at the $(k+1)$-th iteration is:</p>
+                        $ x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j \neq i} a_{ij}x_j^{(k)} \right) $ 
+                        
+                        <h4 class="text-emerald-500 font-semibold">Matrix Form</h4>
+                        <p>In matrix notation, the iteration is expressed as:</p>
+                        $ x^{(k+1)} = Hx^{(k)} + C $ 
+                        <p>Where:</p>
+                        <ul class="list-disc list-inside">
+                            <li>The <b>Iteration Matrix</b> is $H = -D^{-1}(L+U)$</li>
+                            <li>The <b>Constant Vector</b> is $C = D^{-1}b$</li>
+                        </ul>
                     </div>
                 </details>
             </div>
@@ -76,7 +94,7 @@
                             </select>
                         </div>
                         <div>
-                            <label for="tolerance" class="block text-sm font-medium text-gray-300 mb-1">Tolerance ($\epsilon$)</label>
+                            <label for="tolerance" class="inline-flex items-center text-sm font-medium text-gray-300 mb-1">Tolerance ($\epsilon$)</label>
                             <input type="number" id="tolerance" value="0.0001" step="0.0001" min="0" class="w-full p-2 rounded-md input-field">
                         </div>
                         <div>
