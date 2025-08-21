@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jacobi Method Solver</title>
+    
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts for a nicer look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- MathJax for LaTeX rendering -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        },
+        svg: {
+          fontCache: 'global'
+        }
+      };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="p-4 sm:p-8">
+    <a href="../index.html" class="absolute top-4 left-4 text-gray-400 hover:text-white transition-colors">&larr; Back to Home</a>
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
+                Jacobi Method Interactive Solver
+            </h1>
+            <p class="text-gray-400 mt-2">Solve systems of linear equations $Ax = b$ step-by-step.</p>
+        </header>
+
+        <main>
+            <!-- Explanation Section -->
+            <div class="app-card p-6 mb-8">
+                <details>
+                    <summary class="text-lg font-semibold text-emerald-400">What is the Jacobi Method?</summary>
+                    <div class="mt-4 text-gray-300 space-y-3 prose prose-invert max-w-none">
+                        <p>The Jacobi method is an iterative algorithm for determining the solutions of a strictly diagonally dominant system of linear equations. Each diagonal element is solved for, and an approximate value is plugged in. The process is then iterated until it converges.</p>
+                        <p>Given a system $Ax = b$, we can decompose matrix $A$ into $A = L+D+U$, where $L$ is the lower triangular part, $D$ is the diagonal, and $U$ is the upper triangular part.</p>
+                        <p>The iteration formula for each component $x_i$ at step $(k+1)$ is:</p>
+                        $$ x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j \neq i} a_{ij}x_j^{(k)} \right) $$ 
+                        <p>In matrix form, this is written as $x^{(k+1)} = Hx^{(k)} + C$, where the iteration matrix is $H = -D^{-1}(L+U)$ and the constant vector is $C = D^{-1}b$.</p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Main App -->
+            <div id="app" class="app-card p-6">
+                <form id="solver-form">
+                    <h2 class="text-2xl font-bold text-white mb-6 border-b border-gray-600 pb-3">1. Define Your System</h2>
+                    
+                    <!-- Controls for matrix size, tolerance, etc. -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                        <div>
+                            <label for="matrix-size" class="block text-sm font-medium text-gray-300 mb-1">Number of Equations (n)</label>
+                            <select id="matrix-size" class="w-full p-2 rounded-md input-field">
+                                <option value="2">2</option>
+                                <option value="3" selected>3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="tolerance" class="block text-sm font-medium text-gray-300 mb-1">Tolerance ($\epsilon$)</label>
+                            <input type="number" id="tolerance" value="0.0001" step="0.0001" min="0" class="w-full p-2 rounded-md input-field">
+                        </div>
+                        <div>
+                            <label for="max-iterations" class="block text-sm font-medium text-gray-300 mb-1">Max Iterations</label>
+                            <input type="number" id="max-iterations" value="100" step="1" min="1" class="w-full p-2 rounded-md input-field">
+                        </div>
+                    </div>
+                    
+                    <!-- Dynamic Matrix Input Grid -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Matrix [A] and Vector [b]</label>
+                        <div id="matrix-container" class="grid gap-2 items-center">
+                            <!-- JavaScript will populate this section -->
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex items-center gap-4 flex-wrap">
+                        <button type="submit" class="font-bold py-2 px-6 rounded-md btn-primary">
+                            Solve System
+                        </button>
+                        <button type="button" id="randomize-button" class="font-bold py-2 px-6 rounded-md btn-tertiary">
+                            Randomize
+                        </button>
+                         <button type="button" id="reset-button" class="font-bold py-2 px-6 rounded-md btn-secondary">
+                            Reset
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Results Section (Initially Hidden) -->
+                <div id="results-container" class="mt-8 hidden">
+                    <h2 class="text-2xl font-bold text-white mb-4 border-b border-gray-600 pb-3">2. Results</h2>
+                    <div id="message-area" class="p-4 rounded-md mb-4 text-white"></div>
+                    
+                    <div id="solution-area" class="mb-6">
+                        <h3 class="text-lg font-semibold text-emerald-400 mb-2">Final Solution (x)</h3>
+                        <div id="final-solution" class="p-4 bg-gray-900 rounded-md font-mono text-lg"></div>
+                    </div>
+
+                    <div id="iterations-area" class="mb-6">
+                         <h3 class="text-lg font-semibold text-emerald-400 mb-2">Iteration Steps</h3>
+                         <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead id="iterations-head" class="bg-gray-700 text-gray-300"></thead>
+                                <tbody id="iterations-body" class="font-mono text-sm"></tbody>
+                            </table>
+                         </div>
+                    </div>
+                    
+                    <!-- Matrix Decomposition Section -->
+                    <div id="matrix-decomposition-area">
+                        <h3 class="text-lg font-semibold text-emerald-400 mb-2">Jacobi Method Matrices</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <h4 class="font-semibold mb-2">Lower Triangular (L)</h4>
+                                <div id="l-matrix" class="p-3 bg-gray-900 rounded-md font-mono text-sm overflow-x-auto"></div>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-2">Diagonal (D)</h4>
+                                <div id="d-matrix" class="p-3 bg-gray-900 rounded-md font-mono text-sm overflow-x-auto"></div>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-2">Upper Triangular (U)</h4>
+                                <div id="u-matrix" class="p-3 bg-gray-900 rounded-md font-mono text-sm overflow-x-auto"></div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                             <div class="md:col-span-2">
+                                <h4 class="font-semibold mb-2">Iteration Matrix (H) = -D⁻¹(L+U)</h4>
+                                <div id="h-matrix" class="p-3 bg-gray-900 rounded-md font-mono text-sm overflow-x-auto"></div>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-2">Constant Vector (C) = D⁻¹b</h4>
+                                <div id="c-vector" class="p-3 bg-gray-900 rounded-md font-mono text-sm overflow-x-auto"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+        
+        <footer class="text-center mt-8 text-gray-500 text-sm">
+            <p>Created with Gemini</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
