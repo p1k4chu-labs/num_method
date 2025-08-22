@@ -211,8 +211,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div id="chart-container" class="hidden"><canvas id="convergenceChart"></canvas></div>
                 <div id="iteration-table-container" class="max-h-80 overflow-auto custom-scrollbar bg-gray-900/50 rounded-lg p-2">
-                    <table class="w-full text-center table-fixed">
-                        <thead class="sticky top-0 bg-gray-900/80 backdrop-blur-sm"><tr>${tableHeader}</tr></thead>
+                    <table class="w-full text-center table-auto">
+                    <thead class="sticky top-0 bg-gray-900/80 backdrop-blur-sm"><tr>${tableHeader}</tr></thead>
                         <tbody class="divide-y divide-gray-700">${tableBody}</tbody>
                     </table>
                 </div>

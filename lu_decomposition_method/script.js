@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const generateGridsBtn = document.getElementById('generate-grids');
     const randomizeBtn = document.getElementById('randomize');
     const solveBtn = document.getElementById('solve-system');
+    const resetBtn = document.getElementById('reset-btn'); // Get the new reset button
     const matrixA_Grid = document.getElementById('matrix-a-grid');
     const matrixB_Grid = document.getElementById('matrix-b-grid');
     const resultsSection = document.getElementById('results-section');
@@ -32,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     generateGridsBtn.addEventListener('click', generateGrids);
     randomizeBtn.addEventListener('click', randomizeInputs);
     solveBtn.addEventListener('click', solveSystem);
+    resetBtn.addEventListener('click', resetInputs); // Add event listener for reset button
     closeModalBtn.addEventListener('click', () => errorModal.classList.add('hidden'));
 
     // --- TITLE UPDATER ---
@@ -104,6 +106,13 @@ document.addEventListener('DOMContentLoaded', () => {
         inputs.forEach(input => {
             input.value = Math.floor(Math.random() * 19) - 9;
         });
+    }
+
+    function resetInputs() {
+        matrixSizeInput.value = '3'; // Reset matrix size to default
+        generateGrids(); // Regenerate grids to clear inputs
+        resultsSection.classList.add('hidden'); // Hide results section
+        errorModal.classList.add('hidden'); // Hide error modal if open
     }
 
     function getMatrixValues() {
@@ -323,4 +332,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- INITIALIZATION ---
     generateGrids();
+});
+
+// Toggle switch animation
+document.querySelectorAll('.control-item input[type="checkbox"]').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        const dot = this.nextElementSibling.querySelector('.dot');
+        if (this.checked) {
+            dot.style.transform = 'translateX(100%)';
+            this.nextElementSibling.classList.remove('bg-gray-600');
+            this.nextElementSibling.classList.add('bg-blue-500');
+        } else {
+            dot.style.transform = 'translateX(0)';
+            this.nextElementSibling.classList.remove('bg-blue-500');
+            this.nextElementSibling.classList.add('bg-gray-600');
+        }
+    });
 });
