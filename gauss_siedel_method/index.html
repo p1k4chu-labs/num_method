@@ -7,16 +7,12 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css" integrity="sha384-Xi8rHCmBmhbuyz0IwkBC5jCfqg8LFXfg4ccIv23agUuPkgTTNg89vpS/lUvfz3G3" crossorigin="anonymous">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js" integrity="sha384-X/XCfMm41YSfkJ/k3eEeGuMWHddd2hxo1EntEBER7UPG/RVOLuIbG9enG06Jp/d5" crossorigin="anonymous"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4T5Fldv6BUI8M2duHnVuAckPvcvr9weQ9kR7wKltb" crossorigin="anonymous"></script>
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css">
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="text-gray-200">
@@ -27,12 +23,14 @@
         </svg>
         <span class="hidden sm:inline">Back to Home</span>
     </a>
+
     <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-5xl">
         
         <header class="text-center mb-8">
             <h1 class="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300">Advanced Gauss-Seidel Solver</h1>
             <p class="mt-2 text-lg text-gray-400">Solve Ax = b with detailed iteration analysis.</p>
         </header>
+
         <div class="max-w-5xl mx-auto mb-8">
             <details id="gauss-seidel-details" class="glass-card rounded-lg overflow-hidden transition-all duration-300">
                 <summary class="p-4 cursor-pointer flex justify-between items-center font-semibold text-lg text-white hover:bg-gray-700/50 transition-colors">
@@ -48,7 +46,7 @@
                     <h4 class="text-white">Component-wise Formula</h4>
                     <p>The formula for each component x<sub>i</sub> at iteration (k+1) is:</p>
                     <div class="p-3 bg-gray-900 rounded-md text-center text-sm">
-                        <span class="text-cyan-300">$$x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j<i} a_{ij}x_j^{(k+1)} - \sum_{j>i} a_{ij}x_j^{(k)} \right)$$</span>
+                        <span class="text-cyan-300">$$x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j&lt;i} a_{ij}x_j^{(k+1)} - \sum_{j&gt;i} a_{ij}x_j^{(k)} \right)$$</span>
                     </div>
 
                     <h4 class="text-white">Matrix Formula</h4>
@@ -70,7 +68,6 @@
         </div>
 
         <main class="glass-card p-6 rounded-2xl shadow-2xl space-y-8">
-
             <section>
                 <h2 class="text-2xl font-semibold border-b border-gray-600 pb-3 mb-4 text-white">1. System Setup</h2>
                 <div>
@@ -127,18 +124,22 @@
     </div>
 
     <script src="script.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Initial render for static content
-            renderMathInElement(document.body, {
-                delimiters: [
-                    {left: "$$", right: "$$", display: true},
-                    {left: "$", right: "$", display: false}
-                ]
-            });
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-            // Re-render math when the details tag is opened
-            const detailsElement = document.getElementById('gauss-seidel-details');
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script>
+    
+    <script>
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+
+        const detailsElement = document.getElementById('gauss-seidel-details');
+        if (detailsElement) {
             detailsElement.addEventListener('toggle', function() {
                 if (detailsElement.open) {
                     renderMathInElement(detailsElement, {
@@ -149,7 +150,7 @@
                     });
                 }
             });
-        });
+        }
     </script>
 </body>
 </html>

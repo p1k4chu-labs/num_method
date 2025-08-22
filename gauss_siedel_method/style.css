@@ -67,3 +67,4 @@ input:checked + .toggle-bg {
         box-shadow: 0 0 0 0 rgba(96, 165, 250, 0);
     }
 }
+/* The extra closing brace that was here has been removed. */
