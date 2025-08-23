@@ -46,7 +46,7 @@
                     <h4 class="text-white">Component-wise Formula</h4>
                     <p>The formula for each component x<sub>i</sub> at iteration (k+1) is:</p>
                     <div class="p-3 bg-gray-900 rounded-md text-center text-sm">
-                        <span class="text-cyan-300">$$x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j&lt;i} a_{ij}x_j^{(k+1)} - \sum_{j&gt;i} a_{ij}x_j^{(k)} \right)$$</span>
+                        <span class="text-cyan-300">$$x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j<i} a_{ij}x_j^{(k+1)} - \sum_{j>i} a_{ij}x_j^{(k)} \right)$$</span>
                     </div>
 
                     <h4 class="text-white">Matrix Formula</h4>
@@ -63,6 +63,42 @@
 
                     <h4 class="text-white">Condition for Convergence</h4>
                     <p>A sufficient condition for the method to converge is that the matrix <strong>A</strong> is strictly or irreducibly diagonally dominant. While other matrices may also converge, diagonal dominance is a common guarantee.</p>
+
+                    <!-- SOR Method Details -->
+                    <details id="sor-details" class="glass-card rounded-lg overflow-hidden transition-all duration-300 mt-4">
+                        <summary class="p-4 cursor-pointer flex justify-between items-center font-semibold text-lg text-white hover:bg-gray-700/50 transition-colors">
+                            What is the SOR Method?
+                            <svg class="w-5 h-5 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        <div class="p-6 border-t border-gray-700 text-gray-300 space-y-4 prose prose-invert max-w-none">
+                            <p>The <strong>Successive Over-Relaxation (SOR)</strong> method is an extension of the Gauss-Seidel method used to accelerate the convergence of the iterative process. It introduces a relaxation factor, denoted by <strong>&omega;</strong> (omega), to control the extent of correction applied at each step.</p>
+                            
+                            <h4 class="text-white">Core Concept</h4>
+                            <p>SOR computes the next iterate as a weighted average between the previous iterate and the value computed by the Gauss-Seidel method. The choice of <strong>&omega;</strong> is critical:
+                                <ul>
+                                    <li><strong>&omega; = 1:</strong> The method is identical to the Gauss-Seidel method.</li>
+                                    <li><strong>0 &lt; &omega; &lt; 1:</strong> This is called under-relaxation and is used to stabilize convergence for systems where Gauss-Seidel might diverge.</li>
+                                    <li><strong>&omega; > 1:</strong> This is called over-relaxation and is used to accelerate convergence for systems where Gauss-Seidel converges slowly.</li>
+                                </ul>
+                            </p>
+
+                            <h4 class="text-white">Component-wise Formula</h4>
+                            <p>The formula for each component x<sub>i</sub> at iteration (k+1) is:</p>
+                            <div class="p-3 bg-gray-900 rounded-md text-center text-sm">
+                                <span class="text-cyan-300">$$x_i^{(k+1)} = (1-\omega)x_i^{(k)} + \frac{\omega}{a_{ii}} \left( b_i - \sum_{j<i} a_{ij}x_j^{(k+1)} - \sum_{j>i} a_{ij}x_j^{(k)} \right)$$</span>
+                            </div>
+
+                            <h4 class="text-white">Matrix Formula</h4>
+                            <p>The matrix form of the SOR method is:</p>
+                            <div class="p-3 bg-gray-900 rounded-md text-center text-sm">
+                                <span class="text-cyan-300">$$(D+\omega L)x^{(k+1)} = \omega b - [\omega U - (1-\omega)D]x^{(k)}$$</span>
+                            </div>
+                            <p>The iteration matrix for SOR is:</p>
+                            <div class="p-3 bg-gray-900 rounded-md text-center text-sm">
+                                <span class="text-cyan-300">$$H_{SOR} = (D+\omega L)^{-1}[\omega U - (1-\omega)D]$$</span>
+                            </div>
+                        </div>
+                    </details>
                 </div>
             </details>
         </div>
@@ -93,6 +129,24 @@
                     <div>
                         <label for="max-iterations" class="block font-medium text-gray-300 mb-1">Max Iterations</label>
                         <input type="number" id="max-iterations" value="100" class="form-input w-full p-2 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none transition">
+                    </div>
+                </div>
+                <!-- SOR Method Switch -->
+                <div class="mt-6 p-4 bg-gray-900/50 rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-white">Enable SOR Method</h3>
+                        <div class="flex items-center space-x-3">
+                            <label for="sor-switch" class="text-sm font-medium text-gray-300">Off / On</label>
+                            <div class="relative inline-block w-10 align-middle select-none">
+                                <input type="checkbox" id="sor-switch" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                <label for="sor-switch" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-700 cursor-pointer"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="sor-omega-container" class="hidden mt-4">
+                        <label for="sor-omega" class="block font-medium text-gray-300 mb-1">Relaxation Factor (ω)</label>
+                        <input type="text" id="sor-omega" value="1.2" class="form-input w-full md:w-1/2 p-2 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none transition">
+                        <p class="text-xs text-gray-400 mt-2">Typically 0 < ω < 2. (ω=1 is Gauss-Seidel)</p>
                     </div>
                 </div>
             </section>

@@ -34,6 +34,10 @@ const multiplyMatrixVector = (A, v) => {
     return result;
 };
 
+const multiplyMatrixByScalar = (scalar, M) => M.map(row => row.map(val => scalar * val));
+const addMatrices = (A, B) => A.map((row, i) => row.map((val, j) => val + B[i][j]));
+const subtractMatrices = (A, B) => A.map((row, i) => row.map((val, j) => val - B[i][j]));
+
 const formatNum = (num, places = 4) => (isNaN(num)) ? 'N/A' : num.toFixed(places);
 
 // --- DOM MANIPULATION & EVENT HANDLING ---
@@ -42,6 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const matrixContainer = document.getElementById('matrix-container');
     const resultSection = document.getElementById('result-section');
     const resultOutput = document.getElementById('result-output');
+    const sorSwitch = document.getElementById('sor-switch');
+    const sorOmegaContainer = document.getElementById('sor-omega-container');
     
     let convergenceChart = null;
 
@@ -105,9 +111,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const tolerance = parseFloat(document.getElementById('tolerance').value);
             const maxIterations = parseInt(document.getElementById('max-iterations').value, 10);
+            const useSOR = sorSwitch.checked;
+            const omega = useSOR ? parseFloat(document.getElementById('sor-omega').value) : 1.0;
 
             if (isNaN(tolerance) || tolerance <= 0) throw new Error('Tolerance must be a positive number.');
             if (isNaN(maxIterations) || maxIterations <= 0) throw new Error('Max iterations must be a positive integer.');
+            if (useSOR && (isNaN(omega) || omega <= 0 || omega >= 2)) throw new Error('Omega (ω) for SOR must be between 0 and 2.');
 
             let isDiagonallyDominant = true;
             for (let i = 0; i < n; i++) {
@@ -133,7 +142,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (i !== j) sigma += A[i][j] * x[j];
                     }
                     if (A[i][i] === 0) throw new Error(`Division by zero at A[${i+1},${i+1}]. The matrix is singular.`);
-                    x[i] = (b[i] - sigma) / A[i][i];
+                    const gaussSeidelVal = (b[i] - sigma) / A[i][i];
+                    x[i] = (1 - omega) * x_old[i] + omega * gaussSeidelVal;
                 }
                 iterationHistory.push([...x]);
                 
@@ -146,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? { text: `Success: Converged in ${iteration + 1} iterations.`, class: 'text-green-400' }
                 : { text: 'Failed: Maximum iterations reached.', class: 'text-red-400' };
 
-            displayResults(A, b, x, status, iterationHistory, errorHistory, isDiagonallyDominant);
+            displayResults(A, b, x, status, iterationHistory, errorHistory, isDiagonallyDominant, useSOR, omega);
 
         } catch (error) {
             resultSection.classList.remove('hidden');
@@ -154,16 +164,50 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const displayResults = (A, b, solution, status, history, errorHistory, isDiagonallyDominant) => {
+    const displayResults = (A, b, solution, status, history, errorHistory, isDiagonallyDominant, useSOR, omega) => {
         const n = A.length;
         
         // --- Matrix Decompositions ---
+        const D = Array(n).fill(0).map((_, i) => Array(n).fill(0).map((__, j) => i === j ? A[i][j] : 0));
+        const L = Array(n).fill(0).map((_, i) => Array(n).fill(0).map((__, j) => j < i ? A[i][j] : 0));
         const U = Array(n).fill(0).map((_, i) => Array(n).fill(0).map((__, j) => j > i ? A[i][j] : 0));
-        const D_plus_L = Array(n).fill(0).map((_, i) => Array(n).fill(0).map((__, j) => j <= i ? A[i][j] : 0));
-        
-        const D_plus_L_inv = invertLowerTriangular(D_plus_L);
-        const H = D_plus_L_inv ? multiplyMatrices(D_plus_L_inv, U).map(row => row.map(v => -v)) : null;
-        const C = D_plus_L_inv ? multiplyMatrixVector(D_plus_L_inv, b) : null;
+
+        let H, C, analysisTitle, hFormula, cFormula;
+
+        if (useSOR) {
+            analysisTitle = `Matrix Analysis (SOR, ω=${omega})`;
+            hFormula = `H_{SOR} = (D+ωL)⁻¹[(1-ω)D - ωU]`;
+            cFormula = `C_{SOR} = ω(D+ωL)⁻¹b`;
+
+            const D_plus_omegaL = addMatrices(D, multiplyMatrixByScalar(omega, L));
+            const D_plus_omegaL_inv = invertLowerTriangular(D_plus_omegaL);
+            
+            if (D_plus_omegaL_inv) {
+                const term1_H = multiplyMatrixByScalar(1 - omega, D);
+                const term2_H = multiplyMatrixByScalar(omega, U);
+                const H_right = subtractMatrices(term1_H, term2_H);
+                H = multiplyMatrices(D_plus_omegaL_inv, H_right);
+
+                const C_right = multiplyMatrixVector(D_plus_omegaL_inv, b);
+                C = C_right.map(val => omega * val);
+            } else {
+                H = null; C = null;
+            }
+
+        } else {
+            analysisTitle = "Matrix Analysis (Gauss-Seidel)";
+            hFormula = `H = -(D+L)⁻¹U`;
+            cFormula = `C = (D+L)⁻¹b`;
+
+            const D_plus_L = addMatrices(D, L);
+            const D_plus_L_inv = invertLowerTriangular(D_plus_L);
+            if (D_plus_L_inv) {
+                H = multiplyMatrices(D_plus_L_inv, U).map(row => row.map(v => -v));
+                C = multiplyMatrixVector(D_plus_L_inv, b);
+            } else {
+                H = null; C = null;
+            }
+        }
 
         const renderMatrix = (matrix, title) => {
             if (!matrix) return `<div class="p-4 bg-gray-900 rounded-lg"><h4 class="font-semibold text-lg mb-2 text-gray-300">${title}</h4><p class="text-yellow-400">Matrix could not be computed.</p></div>`;
@@ -194,6 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ${diagonalDominanceWarning}
             <div class="p-4 glass-card rounded-lg fade-in">
                 <h3 class="font-semibold text-xl mb-2 text-white">Summary</h3>
+                <p><strong>Method Used:</strong> <span class="font-bold ${useSOR ? 'text-teal-400' : 'text-blue-400'}">${useSOR ? `SOR (ω = ${omega})` : 'Gauss-Seidel'}</span></p>
                 <p><strong>Status:</strong> <span class="${status.class}">${status.text}</span></p>
                 <p class="text-lg"><strong>Final Solution (x):</strong> <code class="text-cyan-300 font-bold">[${solution.map(v => formatNum(v, 6)).join(', ')}]</code></p>
             </div>
@@ -219,14 +264,10 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
 
             <div class="p-4 glass-card rounded-lg fade-in" style="animation-delay: 0.1s;">
-                <h3 class="font-semibold text-xl mb-2 text-white">Matrix Analysis (xₖ₊₁ = Hxₖ + C)</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    ${renderMatrix(D_plus_L, 'L+D')}
-                    ${renderMatrix(U, 'U')}
-                </div>
+                <h3 class="font-semibold text-xl mb-2 text-white">${analysisTitle} (xₖ₊₁ = Hxₖ + C)</h3>
                 <div class="flex flex-wrap justify-around gap-4 mt-4">
-                    <div class="p-4 bg-gray-900 rounded-lg flex-1 min-w-[280px]"><h4 class="font-semibold text-lg mb-2 text-gray-300">Iteration Matrix (H)</h4><p class="text-sm text-gray-400 mb-2">Formula: <code class="text-cyan-400">H = -(D+L)⁻¹U</code></p>${renderMatrix(H, '').substring(renderMatrix(H, '').indexOf('<div class="grid'))}</div>
-                    <div class="p-4 bg-gray-900 rounded-lg flex-1 min-w-[280px]"><h4 class="font-semibold text-lg mb-2 text-gray-300">Constant Vector (C)</h4><p class="text-sm text-gray-400 mb-2">Formula: <code class="text-cyan-400">C = (D+L)⁻¹b</code></p>${renderVector(C, '').substring(renderVector(C, '').indexOf('<div class="grid'))}</div>
+                    <div class="p-4 bg-gray-900 rounded-lg flex-1 min-w-[280px]"><h4 class="font-semibold text-lg mb-2 text-gray-300">Iteration Matrix (H)</h4><p class="text-sm text-gray-400 mb-2">Formula: <code class="text-cyan-400">${hFormula}</code></p>${renderMatrix(H, '').substring(renderMatrix(H, '').indexOf('<div class="grid'))}</div>
+                    <div class="p-4 bg-gray-900 rounded-lg flex-1 min-w-[280px]"><h4 class="font-semibold text-lg mb-2 text-gray-300">Constant Vector (C)</h4><p class="text-sm text-gray-400 mb-2">Formula: <code class="text-cyan-400">${cFormula}</code></p>${renderVector(C, '').substring(renderVector(C, '').indexOf('<div class="grid'))}</div>
                 </div>
             </div>
         `;
@@ -266,6 +307,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('solve-btn').addEventListener('click', solveSystem);
     document.getElementById('randomize-btn').addEventListener('click', randomizeInputs);
     document.getElementById('reset-btn').addEventListener('click', resetInputs);
+    sorSwitch.addEventListener('change', (e) => {
+        sorOmegaContainer.classList.toggle('hidden', !e.target.checked);
+    });
     
     // ================= START: NEW FEATURE =================
     // This listener handles the "Enter" key press within the matrix input area.
