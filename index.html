@@ -7,91 +7,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #0a192f;
-            --card-color: #112240;
-            --text-color: #ccd6f6;
-            --accent-color: #64ffda;
-            --hover-color: #1e3a5f;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 40px 20px;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-
-        .header h1 {
-            font-size: 3.5rem;
-            color: var(--accent-color);
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto;
-            color: #8892b0;
-        }
-
-        .methods-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-        }
-
-        .card {
-            background-color: var(--card-color);
-            border-radius: 10px;
-            padding: 30px;
-            text-decoration: none;
-            color: var(--text-color);
-            transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
-            border: 1px solid #1e3a5f;
-        }
-
-        .card:hover {
-            transform: translateY(-10px);
-            background-color: var(--hover-color);
-            box-shadow: 0 20px 40px -15px rgba(2,12,27,0.7);
-        }
-
-        .card h2 {
-            color: var(--accent-color);
-            font-size: 1.5rem;
-            margin-top: 0;
-            margin-bottom: 15px;
-        }
-
-        .card p {
-            font-size: 1rem;
-            line-height: 1.6;
-            color: #a8b2d1;
-        }
-
-    .coming-soon {
-            text-align: center;
-            margin-top: 60px;
-            font-size: 1.2rem;
-            color: #8892b0;
-        }
-
-    </style>
+    <link rel="stylesheet" href="style/home.css">
 </head>
 <body>
+    <canvas id="starfield"></canvas>
     <div class="container">
         <div class="header">
             <h1>Numerical Methods Playground</h1>
@@ -101,20 +20,22 @@
         <div class="methods-grid">
             <a href="jacobian_method/" class="card">
                 <h2>Jacobi Method</h2>
-                <p>An iterative algorithm for determining the solutions of a strictly diagonally dominant system of linear equations. Watch the solution converge step-by-step.</p>
-            </a>
-            <a href="lu_decomposition_method/" class="card">
-                <h2>LU Decomposition</h2>
-                <p>A method that factors a matrix as the product of a lower triangular matrix (L) and an upper triangular matrix (U). Compare Crout's and Doolittle's algorithms side-by-side.</p>
+                <p>An iterative algorithm for determining the solutions of a strictly diagonally dominant system of linear equations.</p>
             </a>
             <a href="gauss_siedel_method/" class="card">
                 <h2>Gauss-Seidel Method</h2>
-                <p>An iterative method used to solve a system of linear equations. It's an improvement over the Jacobi method, often converging faster.</p>
+                <p>An iterative method used to solve a system of linear equations. It's an improvement over the Jacobi method.</p>
             </a>
-            <!-- Add more cards here as new methods are created -->
+            <a href="lu_decomposition_method/" class="card">
+                <h2>LU Decomposition</h2>
+                <p>A method for solving systems of linear equations by factoring a matrix into a product of a lower and an upper triangular matrix.</p>
+            </a>
         </div>
 
-        <p class="coming-soon">More methods coming soon...</p>
+        <div class="coming-soon">
+            <p>More methods coming soon!</p>
+        </div>
     </div>
+    <script src="script/home.js"></script>
 </body>
 </html>
