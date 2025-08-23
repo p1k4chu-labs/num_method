@@ -1,7 +1,19 @@
 const canvas = document.getElementById('starfield');
 const ctx = canvas.getContext('2d');
 
-let width, height, particles, mouse, connectionDistance;
+let width, height, particles, mouse;
+
+// Configuration constants
+const PARTICLE_DENSITY = 0.0001; // Adjust this value to change overall particle density
+const CONNECTION_DISTANCE_FACTOR = 0.2; // Adjust this to change how far particles connect
+const PARTICLE_SIZE_MIN = 0;
+const PARTICLE_SIZE_MAX = 2;
+const PARTICLE_SPEED_MIN = 0.5;
+const PARTICLE_SPEED_MAX = 1.5;
+const FOLLOWER_COUNT = 4; // Number of particles that follow the mouse
+const FOLLOWER_FOLLOW_STRENGTH = 0.1;
+
+let connectionDistance;
 
 function setup() {
     const dpr = window.devicePixelRatio || 1;
@@ -20,14 +32,12 @@ function setup() {
         y: height / 2,
     };
 
-    let numParticles;
-    if (width <= 768) {
-        numParticles = 100;
-        connectionDistance = 100;
-    } else {
-        numParticles = 300;
-        connectionDistance = 150;
-    }
+    // Calculate number of particles based on screen area
+    const area = width * height;
+    const numParticles = Math.floor(area * PARTICLE_DENSITY);
+
+    // Calculate connection distance based on the smaller dimension
+    connectionDistance = Math.min(width, height) * CONNECTION_DISTANCE_FACTOR;
 
     particles = [];
     for (let i = 0; i < numParticles; i++) {
@@ -40,18 +50,18 @@ class Particle {
         this.index = index;
         this.x = Math.random() * width;
         this.y = Math.random() * height;
-        this.size = Math.random() * 2 + 1;
-        this.vx = Math.random() * 2 - 1;
-        this.vy = Math.random() * 2 - 1;
-        this.isFollower = this.index < 4;
+        this.size = Math.random() * (PARTICLE_SIZE_MAX - PARTICLE_SIZE_MIN) + PARTICLE_SIZE_MIN;
+        this.vx = Math.random() * (PARTICLE_SPEED_MAX * 2) - PARTICLE_SPEED_MAX;
+        this.vy = Math.random() * (PARTICLE_SPEED_MAX * 2) - PARTICLE_SPEED_MAX;
+        this.isFollower = this.index < FOLLOWER_COUNT;
     }
 
     update() {
         if (this.isFollower) {
             const dx = mouse.x - this.x;
             const dy = mouse.y - this.y;
-            this.x += dx * 0.1;
-            this.y += dy * 0.1;
+            this.x += dx * FOLLOWER_FOLLOW_STRENGTH;
+            this.y += dy * FOLLOWER_FOLLOW_STRENGTH;
         } else {
             this.x += this.vx;
             this.y += this.vy;
