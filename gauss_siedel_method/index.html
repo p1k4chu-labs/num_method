@@ -46,18 +46,18 @@
                     <h4 class="text-white">Component-wise Formula</h4>
                     <p>The formula for each component x<sub>i</sub> at iteration (k+1) is:</p>
                     <div class="p-3 bg-gray-900 rounded-md text-center text-sm">
-                        <span class="text-cyan-300">$$x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j<i} a_{ij}x_j^{(k+1)} - \sum_{j>i} a_{ij}x_j^{(k)} \right)$$</span>
+                        <span class="text-cyan-300 math-formula">x_{i}^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j<i} a_{ij}x_{j}^{(k+1)} - \sum_{j>i} a_{ij}x_{j}^{(k)} \right)</span>
                     </div>
 
                     <h4 class="text-white">Matrix Formula</h4>
                     <p>The matrix form of the Gauss-Seidel method is derived by decomposing the matrix A into its diagonal (D), strictly lower (L), and strictly upper (U) triangular components: <strong>A = D + L + U</strong>.</p>
                     <p>The iterative formula can then be expressed as:</p>
                      <div class="p-3 bg-gray-900 rounded-md text-center text-sm">
-                        <span class="text-cyan-300">$$(D+L)x^{(k+1)} = b - Ux^{(k)}$$</span>
+                        <span class="text-cyan-300 math-formula">(D+L)x^{(k+1)} = b - Ux^{(k)}</span>
                     </div>
                     <p>Solving for x<sup>(k+1)</sup>, we get the iteration matrix form:</p>
                      <div class="p-3 bg-gray-900 rounded-md text-center text-sm">
-                        <span class="text-cyan-300">$$x^{(k+1)} = -(D+L)^{-1}Ux^{(k)} + (D+L)^{-1}b$$</span>
+                        <span class="text-cyan-300 math-formula">x^{(k+1)} = -(D+L)^{-1}Ux^{(k)} + (D+L)^{-1}b</span>
                     </div>
                     <p>This is in the form <strong>x<sup>(k+1)</sup> = Hx<sup>(k)</sup> + C</strong>, where <strong>H</strong> is the iteration matrix and <strong>C</strong> is a constant vector.</p>
 
@@ -85,17 +85,17 @@
                             <h4 class="text-white">Component-wise Formula</h4>
                             <p>The formula for each component x<sub>i</sub> at iteration (k+1) is:</p>
                             <div class="p-3 bg-gray-900 rounded-md text-center text-sm">
-                                <span class="text-cyan-300">$$x_i^{(k+1)} = (1-\omega)x_i^{(k)} + \frac{\omega}{a_{ii}} \left( b_i - \sum_{j<i} a_{ij}x_j^{(k+1)} - \sum_{j>i} a_{ij}x_j^{(k)} \right)$$</span>
+                                <span class="text-cyan-300 math-formula">x_{i}^{(k+1)} = (1-\omega)x_{i}^{(k)} + \frac{\omega}{a_{ii}} \left( b_i - \sum_{j<i} a_{ij}x_{j}^{(k+1)} - \sum_{j>i} a_{ij}x_{j}^{(k)} \right)</span>
                             </div>
 
                             <h4 class="text-white">Matrix Formula</h4>
                             <p>The matrix form of the SOR method is:</p>
                             <div class="p-3 bg-gray-900 rounded-md text-center text-sm">
-                                <span class="text-cyan-300">$$(D+\omega L)x^{(k+1)} = \omega b - [\omega U - (1-\omega)D]x^{(k)}$$</span>
+                                <span class="text-cyan-300 math-formula">(D+\omega L)x^{(k+1)} = \omega b - [\omega U - (1-\omega)D]x^{(k)}</span>
                             </div>
                             <p>The iteration matrix for SOR is:</p>
                             <div class="p-3 bg-gray-900 rounded-md text-center text-sm">
-                                <span class="text-cyan-300">$$H_{SOR} = (D+\omega L)^{-1}[\omega U - (1-\omega)D]$$</span>
+                                <span class="text-cyan-300 math-formula">H_{\text{SOR}} = (D+\omega L)^{-1}[\omega U - (1-\omega)D]</span>
                             </div>
                         </div>
                     </details>
@@ -181,27 +181,32 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script>
-    
     <script>
-        renderMathInElement(document.body, {
-            delimiters: [
-                {left: "$$", right: "$$", display: true},
-                {left: "$", right: "$", display: false}
-            ],
-            throwOnError: false
-        });
+        function renderAllMath(rootElement = document) {
+            const mathElements = rootElement.querySelectorAll('.math-formula');
+            mathElements.forEach(el => {
+                if (el.getAttribute('data-rendered')) return;
+                const formula = el.textContent;
+                try {
+                    katex.render(formula, el, {
+                        throwOnError: false,
+                        displayMode: true
+                    });
+                    el.setAttribute('data-rendered', 'true');
+                } catch (e) {
+                    console.error("KaTeX rendering error:", e);
+                    el.textContent = `Error rendering formula: ${formula}`;
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => renderAllMath());
 
         const detailsElement = document.getElementById('gauss-seidel-details');
         if (detailsElement) {
             detailsElement.addEventListener('toggle', function() {
-                if (detailsElement.open) {
-                    renderMathInElement(detailsElement, {
-                        delimiters: [
-                            {left: "$$", right: "$$", display: true},
-                            {left: "$", right: "$", display: false}
-                        ]
-                    });
+                if (this.open) {
+                    renderAllMath(this);
                 }
             });
         }
