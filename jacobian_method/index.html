@@ -3,186 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jacobi Method Solver</title>
+    <title>Advanced Jacobi Method Solver</title>
     
-    <!-- Tailwind CSS for modern styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts for a nicer look -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- MathJax for LaTeX rendering -->
-    <script>
-      MathJax = {
-        tex: {
-          inlineMath: [['$', '$'], ['\\(', '\\)']],
-          displayMath: [['$$', '$$'], ['\\[', '\\]']],
-          processEscapes: true
-        },
-        svg: {
-          fontCache: 'global'
-        }
-      };
-    </script>
-    <script type="text/javascript" id="MathJax-script" async
-      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
-    </script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css">
+    
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="p-4 sm:p-8">
-    <a href="../index.html" class="absolute top-4 left-4 text-gray-400 hover:text-white transition-colors">&larr; Back to Home</a>
+<body class="text-gray-200">
 
-    <div class="max-w-4xl mx-auto">
-        <!-- Header -->
+    <a href="../index.html" class="fixed top-6 left-6 z-20 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 flex items-center space-x-2">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+        </svg>
+        <span class="hidden sm:inline">Back to Home</span>
+    </a>
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-5xl">
+        
         <header class="text-center mb-8">
-            <h1 class="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
-                Jacobi Method Interactive Solver
-            </h1>
-            <p class="text-gray-400 mt-2">Solve systems of linear equations $Ax = b$ step-by-step.</p>
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">Advanced Jacobi Method Solver</h1>
+            <p class="mt-2 text-lg text-gray-400">Solve Ax = b with detailed iteration analysis.</p>
         </header>
 
-        <main>
-            <!-- Explanation Section -->
-            <div class="app-card p-6 mb-8">
-                <details>
-                    <summary class="text-lg font-semibold text-emerald-400">What is the Jacobi Method?</summary>
-                    <div class="mt-4 text-gray-300 space-y-4 prose prose-invert max-w-none">
-                        <p>The Jacobi method is an iterative algorithm used to find the solutions of a strictly diagonally dominant system of linear equations. It works by solving for each diagonal element and then plugging in approximate values. This process is repeated, or iterated, until the solution converges to a desired level of accuracy.</p>
-                        
-                        <h4 class="text-emerald-500 font-semibold">The Core Idea</h4>
-                        <p>For a given system of equations $Ax = b$, we can decompose the matrix $A$ into three parts: </p>
-                        <ul class="list-disc list-inside">
-                            <li><b>L</b>: The strictly lower triangular part of A.</li>
-                            <li><b>D</b>: The diagonal part of A.</li>
-                            <li><b>U</b>: The strictly upper triangular part of A.</li>
-                        </ul>
-                        <p>So, $A = L + D + U$.</p>
+        <div class="max-w-5xl mx-auto mb-8">
+            <details id="method-details" class="glass-card rounded-lg overflow-hidden transition-all duration-300">
+                <summary class="p-4 cursor-pointer flex justify-between items-center font-semibold text-lg text-white hover:bg-gray-700/50 transition-colors">
+                    What is the Jacobi Method?
+                    <svg class="w-5 h-5 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </summary>
+                <div class="p-6 border-t border-gray-700 text-gray-300 space-y-4 prose prose-invert max-w-none">
+                    <ul>
+                        <li>The <strong>Jacobi Method</strong> is an iterative algorithm for solving a system of linear equations, <span class="math-formula-inline">Ax = b</span>.</li>
+                        <li>It starts with an initial guess and repeatedly refines it to converge towards the solution.</li>
+                        <li>A key feature is that it uses only values from the previous iteration (<span class="math-formula-inline">k</span>) to compute the entire new solution vector for the current iteration (<span class="math-formula-inline">k+1</span>).</li>
+                    </ul>
 
-                        <h4 class="text-emerald-500 font-semibold">The Iteration Formula</h4>
-                        <p>The formula to find the $i$-th component of the solution vector $x$ at the $(k+1)$-th iteration is:</p>
-                        $ x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j \neq i} a_{ij}x_j^{(k)} \right) $ 
-                        
-                        <h4 class="text-emerald-500 font-semibold">Matrix Form</h4>
-                        <p>In matrix notation, the iteration is expressed as:</p>
-                        $ x^{(k+1)} = Hx^{(k)} + C $ 
-                        <p>Where:</p>
-                        <ul class="list-disc list-inside">
-                            <li>The <b>Iteration Matrix</b> is $H = -D^{-1}(L+U)$</li>
-                            <li>The <b>Constant Vector</b> is $C = D^{-1}b$</li>
-                        </ul>
-                    </div>
-                </details>
-            </div>
-
-            <!-- Main App -->
-            <div id="app" class="app-card p-6">
-                <form id="solver-form">
-                    <h2 class="text-2xl font-bold text-white mb-6 border-b border-gray-600 pb-3">1. Define Your System</h2>
-                    
-                    <!-- Controls for matrix size, tolerance, etc. -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                        <div>
-                            <label for="matrix-size" class="block text-sm font-medium text-gray-300 mb-1">Number of Equations (n)</label>
-                            <select id="matrix-size" class="w-full p-2 rounded-md input-field">
-                                <option value="2">2</option>
-                                <option value="3" selected>3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="tolerance" class="inline-flex items-center text-sm font-medium text-gray-300 mb-1">Tolerance ($\epsilon$)</label>
-                            <input type="number" id="tolerance" value="0.0001" step="0.0001" min="0" class="w-full p-2 rounded-md input-field">
-                        </div>
-                        <div>
-                            <label for="max-iterations" class="block text-sm font-medium text-gray-300 mb-1">Max Iterations</label>
-                            <input type="number" id="max-iterations" value="100" step="1" min="1" class="w-full p-2 rounded-md input-field">
-                        </div>
-                    </div>
-                    
-                    <!-- Dynamic Matrix Input Grid -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Matrix [A] and Vector [b]</label>
-                        <div id="matrix-container" class="grid gap-2 items-center">
-                            <!-- JavaScript will populate this section -->
-                        </div>
+                    <h4 class="text-emerald-400 font-semibold">Component-wise Formula</h4>
+                    <p>The core of the method is the update rule for each individual component <span class="math-formula-inline">x_i</span> of the solution vector:</p>
+                    <div class="formula-box">
+                       <span class="text-cyan-300 math-formula">x_{i}^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j \neq i} a_{ij}x_{j}^{(k)} \right)</span>
                     </div>
 
-                    <!-- Action Buttons -->
-                    <div class="flex items-center gap-4 flex-wrap">
-                        <button type="submit" class="font-bold py-2 px-6 rounded-md btn-primary">
-                            Solve System
-                        </button>
-                        <button type="button" id="randomize-button" class="font-bold py-2 px-6 rounded-md btn-tertiary">
-                            Randomize
-                        </button>
-                         <button type="button" id="reset-button" class="font-bold py-2 px-6 rounded-md btn-secondary">
-                            Reset
-                        </button>
+                    <h4 class="text-emerald-400 font-semibold">Matrix Form</h4>
+                    <p>The entire iterative process can be expressed more concisely in matrix form.</p>
+                    <div class="formula-box">
+                        <span class="text-cyan-300 math-formula">x^{(k+1)} = Hx^{(k)} + C</span>
                     </div>
-                </form>
-
-                <!-- Results Section (Initially Hidden) -->
-                <div id="results-container" class="mt-8 hidden">
-                    <h2 class="text-2xl font-bold text-white mb-4 border-b border-gray-600 pb-3">2. Results</h2>
-                    <div id="message-area" class="p-4 rounded-md mb-4 text-white"></div>
-                    
-                    <div id="solution-area" class="mb-6">
-                        <h3 class="text-lg font-semibold text-emerald-400 mb-2">Final Solution (x)</h3>
-                        <div id="final-solution" class="p-4 bg-gray-900 rounded-md font-mono text-lg"></div>
-                    </div>
-
-                    <div id="iterations-area" class="mb-6">
-                         <h3 class="text-lg font-semibold text-emerald-400 mb-2">Iteration Steps</h3>
-                         <div class="overflow-x-auto">
-                            <table class="w-full text-left">
-                                <thead id="iterations-head" class="bg-gray-700 text-gray-300"></thead>
-                                <tbody id="iterations-body" class="font-mono text-sm"></tbody>
-                            </table>
-                         </div>
-                    </div>
-                    
-                    <!-- Matrix Decomposition Section -->
-                    <div id="matrix-decomposition-area">
-                        <h3 class="text-lg font-semibold text-emerald-400 mb-2">Jacobi Method Matrices</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div>
-                                <h4 class="font-semibold mb-2">Lower Triangular (L)</h4>
-                                <div id="l-matrix" class="p-3 bg-gray-900 rounded-md font-mono text-sm overflow-x-auto"></div>
+                    <p>Where the components are derived by splitting the matrix <span class="math-formula-inline">A</span> into its Diagonal (<span class="math-formula-inline">D</span>), Lower (<span class="math-formula-inline">L</span>), and Upper (<span class="math-formula-inline">U</span>) parts:</p>
+                    <ul>
+                        <li>
+                            <p class="mb-1">The <strong>Iteration Matrix (H)</strong>, which must have a spectral radius less than 1 for convergence, is:</p>
+                            <div class="formula-box">
+                               <span class="text-cyan-300 math-formula">H_J = -D^{-1}(L+U)</span>
                             </div>
-                            <div>
-                                <h4 class="font-semibold mb-2">Diagonal (D)</h4>
-                                <div id="d-matrix" class="p-3 bg-gray-900 rounded-md font-mono text-sm overflow-x-auto"></div>
+                        </li>
+                        <li>
+                            <p class="mb-1">The <strong>Constant Vector (C)</strong> is:</p>
+                            <div class="formula-box">
+                               <span class="text-cyan-300 math-formula">C_J = D^{-1}b</span>
                             </div>
-                            <div>
-                                <h4 class="font-semibold mb-2">Upper Triangular (U)</h4>
-                                <div id="u-matrix" class="p-3 bg-gray-900 rounded-md font-mono text-sm overflow-x-auto"></div>
+                        </li>
+                    </ul>
+
+                    <!-- SOR Method Details -->
+                    <details id="sor-details" class="glass-card rounded-lg overflow-hidden transition-all duration-300 mt-6">
+                        <summary class="p-4 cursor-pointer flex justify-between items-center font-semibold text-lg text-white hover:bg-gray-700/50 transition-colors">
+                            What is the SOR Method (using Jacobi Scheme)?
+                            <svg class="w-5 h-5 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        <div class="p-6 border-t border-gray-700 text-gray-300 space-y-4 prose prose-invert max-w-none">
+                            <p>This is an extension of the Jacobi method that often accelerates convergence. It introduces a <strong>relaxation factor</strong>, <span class="math-formula-inline">\omega</span>, to control the step size of the update.</p>
+                            <ul>
+                                <li>If <span class="math-formula-inline">\omega = 1</span>, the method is identical to the standard Jacobi method.</li>
+                                <li>If <span class="math-formula-inline">0 < \omega < 1</span>, it is called <strong>under-relaxation</strong>, which can stabilize convergence.</li>
+                                <li>If <span class="math-formula-inline">\omega > 1</span>, it is called <strong>over-relaxation</strong>, which can speed up convergence if the system is suitable.</li>
+                            </ul>
+
+                            <h4 class="text-white">Component-wise Formula</h4>
+                            <p>The update rule is modified to be a weighted average between the old value and the new Jacobi value:</p>
+                            <div class="formula-box">
+                                <span class="text-cyan-300 math-formula">x_{i}^{(k+1)} = (1-\omega)x_{i}^{(k)} + \omega \left[ \frac{1}{a_{ii}} \left( b_i - \sum_{j \neq i} a_{ij}x_{j}^{(k)} \right) \right]</span>
+                            </div>
+
+                            <h4 class="text-white">Matrix Formula</h4>
+                            <p>The iteration matrix for this scheme (often called JOR) is a combination of the Identity matrix (<span class="math-formula-inline">I</span>) and the Jacobi iteration matrix (<span class="math-formula-inline">H_J</span>):</p>
+                            <div class="formula-box">
+                                <span class="text-cyan-300 math-formula">H_{\text{JOR}} = (1-\omega)I + \omega H_{\text{J}}</span>
                             </div>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-                             <div class="md:col-span-2">
-                                <h4 class="font-semibold mb-2">Iteration Matrix (H) = -D⁻¹(L+U)</h4>
-                                <div id="h-matrix" class="p-3 bg-gray-900 rounded-md font-mono text-sm overflow-x-auto"></div>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold mb-2">Constant Vector (C) = D⁻¹b</h4>
-                                <div id="c-vector" class="p-3 bg-gray-900 rounded-md font-mono text-sm overflow-x-auto"></div>
-                            </div>
-                        </div>
-                    </div>
-
+                    </details>
                 </div>
-            </div>
+            </details>
+        </div>
+
+        <main class="glass-card p-6 rounded-2xl shadow-2xl space-y-8">
+            <section>
+                <h2 class="text-2xl font-semibold border-b border-gray-600 pb-3 mb-4 text-white">1. System Setup</h2>
+                <div>
+                    <label for="matrix-size" class="font-medium text-gray-300 mb-2 block">Number of Equations (n)</label>
+                    <select id="matrix-size" class="form-select w-full md:w-1/2 p-2 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none transition">
+                        <option>2</option><option selected>3</option><option>4</option><option>5</option>
+                    </select>
+                </div>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-semibold border-b border-gray-600 pb-3 mb-4 text-white">2. Input Matrix (A) and Vector (b)</h2>
+                <div id="matrix-container" class="overflow-x-auto custom-scrollbar"></div>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-semibold border-b border-gray-600 pb-3 mb-4 text-white">3. Parameters</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="tolerance" class="block font-medium text-gray-300 mb-1">Tolerance (&epsilon;)</label>
+                        <input type="text" id="tolerance" value="0.0001" class="form-input w-full p-2 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none transition">
+                    </div>
+                    <div>
+                        <label for="max-iterations" class="block font-medium text-gray-300 mb-1">Max Iterations</label>
+                        <input type="number" id="max-iterations" value="100" class="form-input w-full p-2 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none transition">
+                    </div>
+                </div>
+                <!-- SOR Method Switch -->
+                <div class="mt-6 p-4 bg-gray-900/50 rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-white">Enable SOR Method</h3>
+                        <div class="flex items-center space-x-3">
+                            <label for="sor-switch" class="text-sm font-medium text-gray-300">Off / On</label>
+                            <div class="relative inline-block w-10 align-middle select-none">
+                                <input type="checkbox" id="sor-switch" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                <label for="sor-switch" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-700 cursor-pointer"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="sor-omega-container" class="hidden mt-4">
+                        <label for="sor-omega" class="block font-medium text-gray-300 mb-1">Relaxation Factor (&omega;)</label>
+                        <input type="text" id="sor-omega" value="1.2" class="form-input w-full md:w-1/2 p-2 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none transition">
+                        <p class="text-xs text-gray-400 mt-2">Typically 0 < &omega; < 2. (&omega;=1 is standard Jacobi)</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section>
+                 <h2 class="text-2xl font-semibold border-b border-gray-600 pb-3 mb-4 text-white">4. Actions</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <button id="solve-btn" class="group w-full bg-gradient-to-r from-green-500 to-teal-500 text-white font-bold py-3 px-4 rounded-lg text-lg flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-6m-3 6v-3m-3 3h.01M12 3a9 9 0 11-9 9 9 9 0 019-9z"></path></svg>
+                        <span>Solve System</span>
+                    </button>
+                    <button id="randomize-btn" class="group w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold py-3 px-6 rounded-md flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-lg">
+                       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                       <span>Randomize</span>
+                    </button>
+                    <button id="reset-btn" class="group w-full bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 11a8 8 0 018-8v5l-3-3 3 3V3a8 8 0 018 8m0 5a8 8 0 01-8 8v-5l3 3-3-3v5a8 8 0 01-8-8"></path></svg>
+                        <span>Reset</span>
+                    </button>
+                </div>
+            </section>
+
+            <section id="result-section" class="hidden">
+                <h2 class="text-2xl font-semibold border-b border-gray-600 pb-3 mb-4 text-white">5. Results</h2>
+                <div id="result-output" class="space-y-6"></div>
+            </section>
+
         </main>
-        
-        <footer class="text-center mt-8 text-gray-500 text-sm">
-            <p>Created with Gemini</p>
-        </footer>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script>
+    <script>
+        function renderAllMath(rootElement = document) {
+            const mathElements = rootElement.querySelectorAll('.math-formula, .math-formula-inline');
+            mathElements.forEach(el => {
+                if (el.getAttribute('data-rendered')) return;
+                const formula = el.textContent;
+                const isInline = el.classList.contains('math-formula-inline');
+                try {
+                    katex.render(formula, el, {
+                        throwOnError: false,
+                        displayMode: !isInline
+                    });
+                    el.setAttribute('data-rendered', 'true');
+                } catch (e) {
+                    console.error("KaTeX rendering error:", e);
+                    el.textContent = `Error: ${formula}`;
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAllMath();
+            const detailsElement = document.getElementById('method-details');
+            if (detailsElement) {
+                detailsElement.addEventListener('toggle', function() {
+                    if (this.open) {
+                        renderAllMath(this);
+                    }
+                });
+            }
+        });
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
