@@ -1,7 +1,7 @@
 const canvas = document.getElementById('starfield');
 const ctx = canvas.getContext('2d');
 
-let width, height, particles, mouse;
+let width, height, particles, mouse, connectionDistance;
 
 function setup() {
     width = window.innerWidth;
@@ -14,8 +14,16 @@ function setup() {
         y: height / 2,
     };
 
+    let numParticles;
+    if (width <= 768) {
+        numParticles = 100;
+        connectionDistance = 100;
+    } else {
+        numParticles = 300;
+        connectionDistance = 150;
+    }
+
     particles = [];
-    const numParticles = 300;
     for (let i = 0; i < numParticles; i++) {
         particles.push(new Particle(i));
     }
@@ -66,9 +74,9 @@ function handleParticles() {
             const dy = particles[i].y - particles[j].y;
             const distance = Math.sqrt(dx * dx + dy * dy);
 
-            if (distance < 150) {
+            if (distance < connectionDistance) {
                 ctx.beginPath();
-                ctx.strokeStyle = `rgba(255, 255, 255, ${1 - distance / 150})`;
+                ctx.strokeStyle = `rgba(255, 255, 255, ${1 - distance / connectionDistance})`;
                 ctx.lineWidth = 0.5;
                 ctx.moveTo(particles[i].x, particles[i].y);
                 ctx.lineTo(particles[j].x, particles[j].y);
