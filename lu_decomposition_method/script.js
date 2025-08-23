@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const generateGridsBtn = document.getElementById('generate-grids');
     const randomizeBtn = document.getElementById('randomize');
     const solveBtn = document.getElementById('solve-system');
-    const resetBtn = document.getElementById('reset-btn'); // Get the new reset button
+    const resetBtn = document.getElementById('reset-btn');
     const matrixA_Grid = document.getElementById('matrix-a-grid');
     const matrixB_Grid = document.getElementById('matrix-b-grid');
     const resultsSection = document.getElementById('results-section');
@@ -33,8 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
     generateGridsBtn.addEventListener('click', generateGrids);
     randomizeBtn.addEventListener('click', randomizeInputs);
     solveBtn.addEventListener('click', solveSystem);
-    resetBtn.addEventListener('click', resetInputs); // Add event listener for reset button
-    closeModalBtn.addEventListener('click', () => errorModal.classList.add('hidden'));
+    resetBtn.addEventListener('click', resetInputs);
+    closeModalBtn.addEventListener('click', () => errorModal.classList.remove('active'));
 
     // --- TITLE UPDATER ---
     function updateMainTitle() {
@@ -109,10 +109,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resetInputs() {
-        matrixSizeInput.value = '3'; // Reset matrix size to default
-        generateGrids(); // Regenerate grids to clear inputs
-        resultsSection.classList.add('hidden'); // Hide results section
-        errorModal.classList.add('hidden'); // Hide error modal if open
+        matrixSizeInput.value = '3';
+        generateGrids();
+        resultsSection.classList.add('hidden');
+        errorModal.classList.remove('active');
     }
 
     function getMatrixValues() {
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 L[i][j] = A[i][j] - sum;
             }
 
-            if (Math.abs(L[j][j]) < 1e-9) return false; // Singular matrix
+            if (Math.abs(L[j][j]) < 1e-9) return false;
 
             for (let i = j + 1; i < n; i++) {
                 let sum = 0;
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < n; i++) L[i][i] = 1;
 
         for (let k = 0; k < n; k++) {
-            if (Math.abs(A[k][k]) < 1e-9) return false; // Check for pivot
+            if (Math.abs(A[k][k]) < 1e-9) return false;
             U[k][k] = A[k][k];
             for (let i = k + 1; i < n; i++) {
                 L[i][k] = A[i][k] / U[k][k];
@@ -262,13 +262,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const title = `${result.method.charAt(0).toUpperCase() + result.method.slice(1)}'s Results`;
         resultsSection.innerHTML = `
-            <div class="w-full">
-                <h2 class="text-3xl font-bold text-center mb-6">${title}</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    ${createResultCard('Lower Matrix [L]', result.L)}
-                    ${createResultCard('Upper Matrix [U]', result.U)}
-                    ${createResultCard('Intermediate [Z]', result.Z)}
-                    ${createResultCard('Solution [X]', result.X)}
+            <div class="results-container">
+                <div class="results-card">
+                    <h3>${title}</h3>
+                    <div class="result-method-container">
+                        ${createResultCard('Lower Matrix [L]', result.L)}
+                        ${createResultCard('Upper Matrix [U]', result.U)}
+                        ${createResultCard('Intermediate [Z]', result.Z)}
+                        ${createResultCard('Solution [X]', result.X)}
+                    </div>
                 </div>
             </div>
         `;
@@ -276,21 +278,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function displayComparisonResults(croutResult, doolittleResult) {
         resultsSection.innerHTML = `
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div>
-                    <h2 class="text-3xl font-bold text-center mb-6">Crout's Results</h2>
-                    ${croutResult.error ? `<div class="results-card text-red-400">${croutResult.error}</div>` : `
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="results-container comparison">
+                <div class="results-card">
+                    <h3>Crout's Results</h3>
+                    ${croutResult.error ? `<div class="text-red-400">${croutResult.error}</div>` : `
+                        <div class="result-method-container">
                             ${createResultCard('Lower Matrix [L]', croutResult.L)}
                             ${createResultCard('Upper Matrix [U]', croutResult.U)}
                             ${createResultCard('Intermediate [Z]', croutResult.Z)}
                             ${createResultCard('Solution [X]', croutResult.X)}
                         </div>`}
                 </div>
-                <div>
-                    <h2 class="text-3xl font-bold text-center mb-6">Doolittle's Results</h2>
-                    ${doolittleResult.error ? `<div class="results-card text-red-400">${doolittleResult.error}</div>` : `
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="results-card">
+                    <h3>Doolittle's Results</h3>
+                    ${doolittleResult.error ? `<div class="text-red-400">${doolittleResult.error}</div>` : `
+                        <div class="result-method-container">
                             ${createResultCard('Lower Matrix [L]', doolittleResult.L)}
                             ${createResultCard('Upper Matrix [U]', doolittleResult.U)}
                             ${createResultCard('Intermediate [Z]', doolittleResult.Z)}
@@ -315,8 +317,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         return `
-            <div class="results-card">
-                <h4 class="text-xl font-semibold mb-4 text-center">${title}</h4>
+            <div class="results-card"> <!-- Added results-card class here -->
+                <h4>${title}</h4>
                 <div class="results-grid" style="--matrix-size: ${isVector ? 1 : n}">
                     ${content}
                 </div>
@@ -327,25 +329,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- ERROR HANDLING ---
     function showError(message) {
         errorMessage.textContent = message;
-        errorModal.classList.remove('hidden');
+        errorModal.classList.add('active');
     }
 
     // --- INITIALIZATION ---
     generateGrids();
-});
-
-// Toggle switch animation
-document.querySelectorAll('.control-item input[type="checkbox"]').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-        const dot = this.nextElementSibling.querySelector('.dot');
-        if (this.checked) {
-            dot.style.transform = 'translateX(100%)';
-            this.nextElementSibling.classList.remove('bg-gray-600');
-            this.nextElementSibling.classList.add('bg-blue-500');
-        } else {
-            dot.style.transform = 'translateX(0)';
-            this.nextElementSibling.classList.remove('bg-blue-500');
-            this.nextElementSibling.classList.add('bg-gray-600');
-        }
-    });
 });

@@ -4,84 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LU Decomposition Solver</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-gray-900 text-white font-sans">
-    <div class="container mx-auto p-4">
-        <a href="../index.html" class="absolute top-4 left-4 btn btn-secondary">Back</a>
-        <h1 id="main-title" class="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-purple-500 to-indigo-600 bg-clip-text text-transparent">Crout's Method Solver</h1>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-button btn btn-secondary">Back</a>
+        <h1 id="main-title">Crout's Method Solver</h1>
 
-        <div class="glassmorphism-container p-6 rounded-lg">
+        <div class="glassmorphism-container">
             <!-- Controls -->
-            <div class="controls-grid mb-6">
+            <div class="controls-grid">
                 <div class="control-item">
-                    <label class="block mb-2 text-sm font-medium">Decomposition Method</label>
-                    <div class="flex items-center space-x-4">
-                        <label class="flex items-center cursor-pointer">
+                    <label>Decomposition Method</label>
+                    <div class="radio-group">
+                        <label>
                             <input type="radio" name="method" value="crout" class="form-radio" checked>
-                            <span class="ml-2">Crout's</span>
+                            <span>Crout's</span>
                         </label>
-                        <label class="flex items-center cursor-pointer">
+                        <label>
                             <input type="radio" name="method" value="doolittle" class="form-radio">
-                            <span class="ml-2">Doolittle's</span>
+                            <span>Doolittle's</span>
                         </label>
                     </div>
                 </div>
                 <div class="control-item">
-                    <label for="compare-switch" class="block mb-2 text-sm font-medium">Compare Both Methods</label>
-                    <label for="compare-switch" class="flex items-center cursor-pointer">
-                        <div class="relative">
-                            <input type="checkbox" id="compare-switch" class="sr-only">
-                            <div class="block bg-gray-600 w-14 h-8 rounded-full"></div>
-                            <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition"></div>
-                        </div>
+                    <label for="compare-switch">Compare Both Methods</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="compare-switch">
+                        <span class="block"></span>
+                        <span class="dot"></span>
                     </label>
                 </div>
                 <div class="control-item">
-                    <label for="matrix-size" class="block mb-2 text-sm font-medium">Matrix Size (n x n)</label>
+                    <label for="matrix-size">Matrix Size (n x n)</label>
                     <input type="number" id="matrix-size" min="2" max="10" value="3" class="input-field">
                 </div>
-                <div class="control-item flex items-end space-x-2">
-                    <button id="generate-grids" class="btn btn-secondary">Generate Grids</button>
+                <div class="control-item button-group">
+                    <button id="generate-grids" class="btn btn-secondary">Generate</button>
                     <button id="randomize" class="btn btn-secondary">Randomize</button>
                     <button id="reset-btn" class="btn btn-secondary">Reset</button>
                 </div>
             </div>
 
             <!-- Matrix Inputs -->
-            <div id="matrix-input-section" class="mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
-                        <h2 class="text-2xl font-semibold mb-4 text-center">Matrix [A]</h2>
+            <div id="matrix-input-section">
+                <div class="matrix-input-grids">
+                    <div class="matrix-grid-container">
+                        <h2>Matrix [A]</h2>
                         <div id="matrix-a-grid" class="matrix-grid"></div>
                     </div>
-                    <div>
-                        <h2 class="text-2xl font-semibold mb-4 text-center">Vector [B]</h2>
+                    <div class="matrix-grid-container">
+                        <h2>Vector [B]</h2>
                         <div id="matrix-b-grid" class="matrix-grid"></div>
                     </div>
                 </div>
             </div>
 
-            <div class="text-center">
+            <div class="solve-button-container">
                 <button id="solve-system" class="btn btn-primary">Solve System</button>
             </div>
         </div>
 
         <!-- Results Section -->
-        <div id="results-section" class="hidden mt-8">
-            <!-- Content will be generated by JavaScript -->
-        </div>
+        <div id="results-section"></div>
+
     </div>
 
     <!-- Error Modal -->
-    <div id="error-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-gray-800 p-8 rounded-lg shadow-xl text-center">
-            <h3 class="text-2xl font-bold mb-4 text-red-500">Error</h3>
-            <p id="error-message" class="mb-6"></p>
+    <div id="error-modal">
+        <div class="modal-content">
+            <h3>Error</h3>
+            <p id="error-message"></p>
             <button id="close-modal" class="btn btn-secondary">Close</button>
         </div>
     </div>
